@@ -6,7 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(matching_engine src/main.cpp
         src/order-book/OrderBook.cpp
-        include/order-book/OrderBook.h)
+        include/OrderBook.h
+        src/ingress-buffer/IngressBuffer.cpp
+        include/IngressBuffer.h
+        include/Order.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -21,15 +24,18 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-        hello_test
-        tests/hello_test.cpp
+        orderbook-test
+        tests/OrderBook.cpp
         src/order-book/OrderBook.cpp
-        include/order-book/OrderBook.h
+        include/OrderBook.h
+        src/ingress-buffer/IngressBuffer.cpp
+        include/IngressBuffer.h
+        include/Order.h
 )
 target_link_libraries(
-        hello_test
+        orderbook-test
         GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(hello_test)
+gtest_discover_tests(orderbook-test)

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "../include/OrderBook.h"
 
 // Demonstrate some basic assertions.
 TEST(HelloTest, BasicAssertions) {
