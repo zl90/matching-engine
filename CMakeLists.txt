@@ -4,7 +4,9 @@ project(matching_engine)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(matching_engine main.cpp hello_test.cpp)
+add_executable(matching_engine src/main.cpp
+        src/order-book/OrderBook.cpp
+        include/order-book/OrderBook.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -20,7 +22,9 @@ enable_testing()
 
 add_executable(
         hello_test
-        hello_test.cpp
+        tests/hello_test.cpp
+        src/order-book/OrderBook.cpp
+        include/order-book/OrderBook.h
 )
 target_link_libraries(
         hello_test
