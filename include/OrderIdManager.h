@@ -5,7 +5,7 @@
 
 class OrderIdManager {
 public:
-    OrderIdManager(const std::size_t next_order_id,
+    OrderIdManager(std::size_t next_order_id,
                    std::unordered_map<std::size_t, bool> &&existing_order_ids) : _next_order_id(
             next_order_id),
         _existing_order_ids(
@@ -22,7 +22,7 @@ public:
 
     OrderIdManager &operator=(OrderIdManager &&) = delete;
 
-    [[nodiscard]] const auto GetNextOrderId() const -> std::size_t;
+    [[nodiscard]] const auto GetNextOrderId() -> std::size_t;
 
     [[nodiscard]] const auto DoesOrderIdExist(const std::size_t &order_id) const -> bool;
 
