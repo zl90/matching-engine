@@ -10,7 +10,9 @@ add_executable(matching_engine src/main.cpp
         src/ingress-buffer/IngressBuffer.cpp
         include/IngressBuffer.h
         include/Order.h
-        include/Trade.h)
+        include/Trade.h
+        include/OrderIdManager.h
+        src/order-id-manager/OrderIdManager.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -33,6 +35,8 @@ add_executable(
         include/IngressBuffer.h
         include/Order.h
         include/Trade.h
+        include/OrderIdManager.h
+        src/order-id-manager/OrderIdManager.cpp
 )
 target_link_libraries(
         orderbook-test

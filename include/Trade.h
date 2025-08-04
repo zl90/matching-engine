@@ -19,13 +19,13 @@ struct Trade {
     const TradeType type;
     const uint32_t user_id;
 
-    std::optional<uint64_t> order_id;
+    std::optional<std::size_t> order_id;
     std::optional<uint32_t> level;
     std::optional<uint32_t> quantity;
     std::optional<Side> side;
     std::optional<RejectReason> reject_reason;
 
-    Trade(const TradeType type, const uint32_t user_id, const std::optional<uint32_t> order_id = std::nullopt,
+    Trade(const TradeType type, const uint32_t user_id, const std::optional<std::size_t> order_id = std::nullopt,
           const std::optional<uint32_t> level = std::nullopt,
           const std::optional<uint32_t> quantity = std::nullopt, const std::optional<Side> side = std::nullopt,
           const std::optional<RejectReason> reject_reason = std::nullopt) : type(type), user_id(user_id),
