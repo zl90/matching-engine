@@ -38,6 +38,7 @@ add_executable(
         include/OrderIdManager.h
         src/order-id-manager/OrderIdManager.cpp
 )
+
 target_link_libraries(
         orderbook-test
         GTest::gtest_main
