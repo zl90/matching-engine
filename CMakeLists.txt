@@ -12,7 +12,8 @@ add_executable(matching_engine src/main.cpp
         include/Order.h
         include/Trade.h
         include/OrderIdManager.h
-        src/order-id-manager/OrderIdManager.cpp)
+        src/order-id-manager/OrderIdManager.cpp
+        include/Level.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -37,6 +38,7 @@ add_executable(
         include/Trade.h
         include/OrderIdManager.h
         src/order-id-manager/OrderIdManager.cpp
+        include/Level.h
 )
 
 target_link_libraries(
