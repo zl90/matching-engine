@@ -2,6 +2,7 @@
 #define ORDERIDMANAGER_H
 #include <cstddef>
 #include <unordered_map>
+#include <random>
 
 class OrderIdManager {
 public:
@@ -26,6 +27,11 @@ public:
 private:
     std::size_t _next_order_id;
     std::unordered_map<std::size_t, bool> _existing_order_ids;
+
+    std::mt19937 _mt;
+    std::uniform_int_distribution<std::size_t> _dist;
+
+    [[nodiscard]] const auto GetRandomOrderId() -> std::size_t;
 };
 
 #endif //ORDERIDMANAGER_H
