@@ -5,8 +5,9 @@
 
 class OrderBook {
 public:
-    OrderBook(std::vector<Level> &&bids, std::vector<Level> &&asks) {
-    };
+    OrderBook(std::vector<Level> &&bids, std::vector<Level> &&asks) : _bids(std::move(bids)),
+                                                                      _asks(std::move(asks)) {
+    }
 
     OrderBook() = delete;
 
@@ -22,16 +23,18 @@ public:
 
     auto SubmitOrder(const Order &order) -> std::vector<Trade>;
 
-    [[nodiscard]] const auto GetBook() const -> std::pair<std::vector<Trade>, std::vector<Trade> >;
+    /** @desc Used for exporting the book for recovery broadcast and storing after shutdown */
+    [[nodiscard]] const auto GetBook() const -> std::pair<std::vector<Level>, std::vector<Level> >;
 
+    /** @desc Used for testing purposes */
     [[nodiscard]] const auto GetBestBid() const -> uint32_t;
 
+    /** @desc Used for testing purposes */
     [[nodiscard]] const auto GetBestAsk() const -> uint32_t;
 
 private:
     std::vector<Level> _bids;
     std::vector<Level> _asks;
 };
-
 
 #endif //ORDERBOOK_H
