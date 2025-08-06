@@ -5,11 +5,12 @@
 
 class OrderBook {
 public:
-    OrderBook(std::vector<Level> &&bids, std::vector<Level> &&asks) : _bids(std::move(bids)),
-                                                                      _asks(std::move(asks)) {
+    OrderBook(const std::vector<Level> &bids, const std::vector<Level> &asks) : _bids(bids),
+        _asks(asks) {
     }
 
-    OrderBook() = delete;
+    OrderBook(): _bids({}), _asks({}) {
+    };
 
     OrderBook(const OrderBook &order_book) = delete;
 

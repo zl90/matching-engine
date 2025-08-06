@@ -2,27 +2,26 @@
 #include "../include/OrderBook.h"
 #include "../include/OrderIdManager.h"
 
-TEST(OrderIdManager, ConstructorGeneratesCorrectNextOrderID) {
-    std::unordered_map<std::size_t, bool> empty_map = {};
-    OrderIdManager om(std::move(empty_map));
+TEST(OrderBook, GetBestBidAskReturnsCorrectValue) {
+    const Level l_10000(10000, {}, {Order(OrderType::LIMIT, 203498)});
+    const Level l_10025(10025, {}, {Order(OrderType::LIMIT, 203498)});
+    const Level l_10100(10100, {Order(OrderType::LIMIT, 908345)}, {});
 
-    std::size_t next = om.GetNextOrderId();
-    EXPECT_EQ(next, 0);
-    next = om.GetNextOrderId();
-    EXPECT_NE(next, 0);
+    const std::vector<Level> bids = {l_10025, l_10000};
+    const std::vector<Level> asks = {l_10100};
 
-    EXPECT_TRUE(om.DoesOrderIdExist(0));
-    EXPECT_TRUE(om.DoesOrderIdExist(next));
+    const OrderBook ob(bids, asks);
 
-    std::unordered_map<std::size_t, bool> map;
-    map[0] = true;
-    map[2] = true;
-    OrderIdManager om2(std::move(map));
+    EXPECT_EQ(ob.GetBestBid(), 10025);
+    EXPECT_EQ(ob.GetBestAsk(), 10100);
+}
 
-    next = om2.GetNextOrderId();
-    EXPECT_NE(next, 0);
+TEST(OrderBook, GetBestBidAskThrowsWhenEmpty) {
+    const std::vector<Level> bids = {};
+    const std::vector<Level> asks = {};
 
-    EXPECT_TRUE(om2.DoesOrderIdExist(0));
-    EXPECT_TRUE(om2.DoesOrderIdExist(2));
-    EXPECT_TRUE(om2.DoesOrderIdExist(next));
+    const OrderBook ob(bids, asks);
+
+    EXPECT_THROW([&]{auto bb = ob.GetBestBid();}(), std::runtime_error);
+    EXPECT_THROW([&]{auto ba = ob.GetBestAsk();}(), std::runtime_error);
 }

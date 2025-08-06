@@ -39,6 +39,7 @@ add_executable(
         include/OrderIdManager.h
         src/order-id-manager/OrderIdManager.cpp
         include/Level.h
+        tests/OrderIdManager.cpp
 )
 
 target_link_libraries(

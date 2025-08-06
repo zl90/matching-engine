@@ -6,7 +6,7 @@
 
 class OrderIdManager {
 public:
-    explicit OrderIdManager(std::unordered_map<std::size_t, bool> &&existing_order_ids);
+    explicit OrderIdManager(const std::unordered_map<std::size_t, bool> &existing_order_ids);
 
     ~OrderIdManager() = default;
 
@@ -25,13 +25,13 @@ public:
     [[nodiscard]] const auto DoesOrderIdExist(const std::size_t &order_id) const -> bool;
 
 private:
-    std::size_t _next_order_id;
-    std::unordered_map<std::size_t, bool> _existing_order_ids;
+    [[nodiscard]] const auto GetRandomOrderId() -> std::size_t;
 
     std::mt19937 _mt;
     std::uniform_int_distribution<std::size_t> _dist;
 
-    [[nodiscard]] const auto GetRandomOrderId() -> std::size_t;
+    std::size_t _next_order_id{};
+    std::unordered_map<std::size_t, bool> _existing_order_ids;
 };
 
 #endif //ORDERIDMANAGER_H

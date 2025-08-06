@@ -1,8 +1,8 @@
 #include "../../include/OrderIdManager.h"
 
-OrderIdManager::OrderIdManager(std::unordered_map<std::size_t, bool> &&existing_order_ids) : _next_order_id(0),
-    _existing_order_ids(std::move(existing_order_ids)), _mt(
-        std::random_device{}()) {
+OrderIdManager::OrderIdManager(const std::unordered_map<std::size_t, bool> &existing_order_ids) : _mt(
+        std::random_device{}()),
+    _next_order_id(GetRandomOrderId()), _existing_order_ids(existing_order_ids) {
 }
 
 const auto OrderIdManager::DoesOrderIdExist(const std::size_t &order_id) const -> bool {
