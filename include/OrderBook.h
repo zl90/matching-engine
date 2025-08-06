@@ -36,6 +36,10 @@ public:
 private:
     std::vector<Level> _bids;
     std::vector<Level> _asks;
+
+    auto InsertRestingLimitOrder(const Order &order) -> void;
+
+    auto HandleLimitOrder(const Order &order) -> std::vector<Trade>;
 };
 
 #endif //ORDERBOOK_H
