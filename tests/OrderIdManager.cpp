@@ -2,8 +2,7 @@
 #include "../include/OrderIdManager.h"
 
 TEST(OrderIdManager, NextOrderIdExistsInSet) {
-    const std::unordered_map<std::size_t, bool> empty_map = {};
-    OrderIdManager om(empty_map);
+    OrderIdManager om;
 
     const std::size_t next = om.GetNextOrderId();
     EXPECT_TRUE(om.DoesOrderIdExist(next));

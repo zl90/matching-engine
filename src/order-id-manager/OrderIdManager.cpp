@@ -1,5 +1,11 @@
 #include "../../include/OrderIdManager.h"
 
+#include <map>
+
+OrderIdManager::OrderIdManager(): _mt(std::random_device{}()), _next_order_id(GetRandomOrderId()),
+                                  _existing_order_ids({}) {
+};
+
 OrderIdManager::OrderIdManager(const std::unordered_map<std::size_t, bool> &existing_order_ids) : _mt(
         std::random_device{}()),
     _next_order_id(GetRandomOrderId()), _existing_order_ids(existing_order_ids) {

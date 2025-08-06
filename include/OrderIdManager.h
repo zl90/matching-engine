@@ -8,9 +8,10 @@ class OrderIdManager {
 public:
     explicit OrderIdManager(const std::unordered_map<std::size_t, bool> &existing_order_ids);
 
+    OrderIdManager();
+
     ~OrderIdManager() = default;
 
-    OrderIdManager() = delete;
 
     OrderIdManager(const OrderIdManager &) = delete;
 
