@@ -7,8 +7,13 @@ TEST(OrderBook, GetBestBidAskReturnsCorrectValue) {
     const Level l_10025(10025, {}, {Order(OrderType::LIMIT, 203498)});
     const Level l_10100(10100, {Order(OrderType::LIMIT, 908345)}, {});
 
-    const std::vector<Level> bids = {l_10025, l_10000};
-    const std::vector<Level> asks = {l_10100};
+    const std::unordered_map<uint32_t, Level> bids = {
+        {10025, l_10025},
+        {10000, l_10000}
+    };
+    const std::unordered_map<uint32_t, Level> asks = {
+        {10100, l_10100}
+    };
 
     const OrderBook ob(bids, asks);
 
@@ -17,8 +22,8 @@ TEST(OrderBook, GetBestBidAskReturnsCorrectValue) {
 }
 
 TEST(OrderBook, GetBestBidAskThrowsWhenEmpty) {
-    const std::vector<Level> bids = {};
-    const std::vector<Level> asks = {};
+    const std::unordered_map<uint32_t, Level> bids;
+    const std::unordered_map<uint32_t, Level> asks;
 
     const OrderBook ob(bids, asks);
 
@@ -35,7 +40,7 @@ TEST(OrderBook, LimitOrderAcceptsInEmptyBook) {
     ASSERT_EQ(trades.size(), 1);
     EXPECT_EQ(ob.GetBestBid(), 10025);
     ASSERT_EQ(ob.GetBook().first.size(), 1);
-    EXPECT_EQ(ob.GetBook().first[0].price, 10025);
+    EXPECT_EQ(ob.GetBook().first.at(10025).price, 10025);
     EXPECT_EQ(trades[0].type, TradeType::ACCEPTED);
     EXPECT_EQ(trades[0].quantity, 10);
     EXPECT_EQ(trades[0].level, 10025);
@@ -48,8 +53,10 @@ TEST(OrderBook, LimitOrderAcceptsInEmptyBook) {
 
 TEST(OrderBook, LimitOrderFillsRestingOrder) {
     const Level l_10000(10000, {}, {Order(OrderType::LIMIT, 1, 10000, 15, Side::SELL, 1)});
-    const std::vector<Level> asks = {l_10000};
-    const std::vector<Level> bids;
+    const std::unordered_map<uint32_t, Level> asks = {
+        {10000, l_10000}
+    };
+    const std::unordered_map<uint32_t, Level> bids;
 
     OrderBook ob(bids, asks);
 
@@ -75,8 +82,10 @@ TEST(OrderBook, LimitOrderFillsRestingOrder) {
 
 TEST(OrderBook, LimitOrderFillsRestingOrderAndAcceptsRemainingQuantity) {
     const Level l_10000(10000, {}, {Order(OrderType::LIMIT, 1, 10000, 15, Side::SELL, 1)});
-    const std::vector<Level> asks = {l_10000};
-    const std::vector<Level> bids;
+    const std::unordered_map<uint32_t, Level> asks = {
+        {10000, l_10000}
+    };
+    const std::unordered_map<uint32_t, Level> bids;
 
     OrderBook ob(bids, asks);
 

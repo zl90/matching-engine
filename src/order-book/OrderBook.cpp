@@ -1,27 +1,79 @@
-
 #include "../../include/OrderBook.h"
 
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 
-auto OrderBook::GetBook() const -> std::pair<std::vector<Level>, std::vector<Level> > {
-    return std::pair{_bids, _asks};
+auto OrderBook::GetBook() const
+    -> std::pair<std::unordered_map<PriceType, Level>, std::unordered_map<PriceType, Level> > {
+    return {_bids, _asks};
 }
 
-const auto OrderBook::GetBestBid() const -> uint32_t {
+const auto OrderBook::GetBestBid() const -> PriceType {
     if (_bids.empty()) {
         throw std::runtime_error("Bids is empty");
     }
-
-    return _bids[0].price;
+    PriceType best_price = std::numeric_limits<PriceType>::min();
+    for (const auto &[key, value]: _bids) {
+        if (key > best_price) {
+            best_price = key;
+        }
+    }
+    return best_price;
 }
 
-const auto OrderBook::GetBestAsk() const -> uint32_t {
+const auto OrderBook::GetBestAsk() const -> PriceType {
     if (_asks.empty()) {
         throw std::runtime_error("Asks is empty");
     }
+    PriceType best_price = std::numeric_limits<PriceType>::max();
 
-    return _asks[0].price;
+    for (const auto &[key, value]: _asks) {
+        if (key < best_price) {
+            best_price = key;
+        }
+    }
+    return best_price;
+}
+
+auto OrderBook::InsertRestingLimitOrder(const Order &order) -> void {
+    auto [type, user_id, level, quantity, side, order_id] = order;
+
+    if (type != OrderType::LIMIT) {
+        throw std::runtime_error("Limit insert failed: only LIMIT orders can be inserted into the book");
+    }
+
+    if (side == Side::BUY) {
+        if (_asks.empty() || GetBestAsk() > level.value()) {
+            auto it = _bids.find(level.value());
+
+            if (it != _bids.end()) {
+                it->second.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
+            } else {
+                Level new_level{level.value(), {}, {}};
+                new_level.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
+                _bids.emplace(level.value(), std::move(new_level));
+            }
+        } else {
+            throw std::runtime_error("Bid insert failed: preventing trade-through!");
+        }
+    } else if (side == Side::SELL) {
+        if (_bids.empty() || GetBestBid() < level.value()) {
+            auto it = _asks.find(level.value());
+
+            if (it != _asks.end()) {
+                it->second.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
+            } else {
+                Level new_level{level.value(), {}, {}};
+                new_level.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
+                _asks.emplace(level.value(), std::move(new_level));
+            }
+        } else {
+            throw std::runtime_error("Ask insert failed: preventing trade-through!");
+        }
+    } else {
+        throw std::runtime_error("Unknown side in order");
+    }
 }
 
 auto OrderBook::SubmitOrder(const Order &order) -> std::vector<Trade> {
@@ -34,45 +86,6 @@ auto OrderBook::SubmitOrder(const Order &order) -> std::vector<Trade> {
     }
 }
 
-auto OrderBook::InsertRestingLimitOrder(const Order &order) -> void {
-    auto [type, user_id, level, quantity, side, order_id] = order;
-
-    if (type != OrderType::LIMIT) {
-        throw std::runtime_error("Limit insert failed: only LIMIT orders can be inserted into the book");
-    }
-
-    if (side == Side::BUY) {
-        if (_asks.empty() || GetBestAsk() > level.value()) {
-            auto level_it = std::find_if(_bids.begin(), _bids.end(), [level](const auto &elem) {
-                elem.price == level.value();
-            });
-
-            const auto level_exists = level_it != _bids.end();
-
-            if (level_exists) {
-                // @todo Add ability for users to insert to the Market Maker queue.
-                auto &selected_level = *level_it;
-                selected_level.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
-            } else {
-                Level new_level{level.value(), {}, {}};
-                new_level.participants_queue.emplace_back(type, user_id, level, quantity, side, order_id);
-
-                const auto insert_position = std::lower_bound(
-                    _bids.begin(),
-                    _bids.end(),
-                    new_level,
-                    [](const Level &a, const Level &b) {
-                        return a.price > b.price; // descending order
-                    });
-
-                _bids.insert(insert_position, std::move(new_level));
-            }
-        } else {
-            throw std::runtime_error("Bid insert failed: preventing trade-through!");
-        }
-    } else {
-    }
-}
 
 auto OrderBook::HandleLimitOrder(const Order &order) -> std::vector<Trade> {
     auto [type, user_id, level, quantity, side, order_id] = order;
@@ -81,17 +94,22 @@ auto OrderBook::HandleLimitOrder(const Order &order) -> std::vector<Trade> {
             const Trade accept_trade{
                 TradeType::ACCEPTED, user_id, std::nullopt, order_id, std::nullopt, level, quantity, side
             };
-
-            // @todo: add an interface for easily inserting resting limit orders.
-
-            return std::vector<Trade>{accept_trade};
+            InsertRestingLimitOrder(order);
+            return {accept_trade};
+        } else {
+            return {};
+        }
+    } else if (side == Side::SELL) {
+        if (_bids.empty() || GetBestBid() < level) {
+            const Trade accept_trade{
+                TradeType::ACCEPTED, user_id, std::nullopt, order_id, std::nullopt, level, quantity, side
+            };
+            InsertRestingLimitOrder(order);
+            return {accept_trade};
+        } else {
+            return {};
         }
     } else {
+        throw std::runtime_error("Unknown side in HandleLimitOrder");
     }
 }
-
-
-
-
-
-

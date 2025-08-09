@@ -41,7 +41,7 @@ struct Trade {
           const std::optional<uint32_t> quantity = std::nullopt, const std::optional<Side> side = std::nullopt,
           const std::optional<RejectReason> reject_reason = std::nullopt,
           const std::optional<FilledSide> filled_side = std::nullopt) : type(type), taker_user_id(taker_user_id),
-                                                                        maker_user_id(taker_user_id),
+                                                                        maker_user_id(maker_user_id),
                                                                         taker_order_id(taker_order_id),
                                                                         maker_order_id(maker_order_id),
                                                                         level(level),
